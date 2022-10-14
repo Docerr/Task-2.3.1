@@ -26,39 +26,27 @@ public class UserController {
         return "index";
     }
 
-    @GetMapping(value = "/new")
+    @GetMapping("/new")
     public String newUser(Model model) {
         model.addAttribute("user", new User());
         return "add_user";
     }
 
     @PostMapping
-    public String addUser(@ModelAttribute("user") User user, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "add_user";
-        }
-        if (user.getId() == 0) {
-            userService.addUser(user);
-        } else {
-            userService.updateUser(user);
-        }
+    public String addUser(@ModelAttribute("user") User user) {
+        userService.addUser(user);
         return "redirect:/users";
     }
 
-    @GetMapping(value = "/{id}/update")
-    public String updateUser(@PathVariable(value = "id") int id, ModelMap model) {
-
-        User user = userService.getUserById(id);
-        if (user == null) {
-            return "redirect:/users";
-        }
-        model.addAttribute("user", user);
+    @GetMapping("/{id}/update")
+    public String editUser(@PathVariable("id") int id, Model model) {
+        model.addAttribute("user", userService.getUserById(id));
         return "update";
     }
 
-    @DeleteMapping("/{id}")
-    public String deleteUser(@PathVariable("id") int id) {
-        userService.deleteUser(id);
+    @PatchMapping (value = "/{id}")
+    public String updateUser(@ModelAttribute("user") User user, @PathVariable("id") int id) {
+        userService.updateUser(user, id);
         return "redirect:/users";
     }
 
@@ -67,4 +55,11 @@ public class UserController {
         model.addAttribute("user", userService.getUserById(id));
         return "show";
     }
+
+    @DeleteMapping("/{id}")
+    public String deleteUser(@PathVariable("id") int id) {
+        userService.deleteUser(id);
+        return "redirect:/users";
+    }
+
 }
